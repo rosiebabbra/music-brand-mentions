@@ -25,6 +25,14 @@ def generate_urls():
 
 
 def retrieve_lyrics(url):
+    """Retrieves lyrics from a provided Genius url.
+
+    Args:
+        url (str): url of Genius webpage containing lyrics
+    Returns:
+        str: Stringified and cleaned lyrics.
+
+    """
 
     doc = requests.get(url)
     html = BeautifulSoup(doc.text, 'lxml')

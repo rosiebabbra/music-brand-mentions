@@ -9,28 +9,52 @@ class MissingDataException(Exception):
     """Raise for output that lacks both song and artist name for each item."""
 
 
-def retrieve_chart_data(url):
+def _return_chart_metadata(meta, level):
+    """Gathers information about top music charts.
+
+    Args:
+        meta (str): 'song' or 'artist'
+        level (str): 'primary' or 'secondary
+
+    Returns:
+        List: collection of metadata from charts page.
+
+    """
 
     doc = requests.get(url)
     html = BeautifulSoup(doc.text, 'lxml')
 
-    bb_class = 'chart-element__information__{} text--truncate color--{}'
+    meta_class = f'chart-element__information__{meta} text--truncate color--{level}'
 
-    song_class = bb_class.format('song', 'primary')
-    song_names = html.findAll("span", {"class": song_class})
-    song_names = [x.get_text().replace(' ', '-').lower() for x in song_names]
+    meta = html.findAll("span", {"class": meta_class})
+    meta_collection = [x.get_text().replace(' ', '-').lower() for x in meta]
 
-    artist_class = bb_class.format('artist', 'secondary')
-    artist_names = html.findAll("span", {"class": artist_class})
-    artist_names = [x.get_text().replace(' ', '-').lower()
-                    for x in artist_names]
+    return meta_collection
+
+
+def retrieve_chart_data(url):
+    """
+    Args:
+        url (str): url of Billboard webpage containing U.S. charts.
+
+    Returns:
+        Dict: key value pairs of each top song and its artist(s).
+
+    """
+
+    song_names = _return_chart_metadata('song', 'primary')
+    artist_names = _return_chart_metadata('artist', 'secondary')
+    
     # Need to adjust to handle multiple artists. For example:
+    
     # Current format: https://genius.com/anuel-aa,-daddy-yankee,-karol-g,-ozuna-&-j-balvin-china-lyrics
     # Correct format: https://genius.com/anuel-aa-daddy-yankee-and-karol-g-china-lyrics
-    # Even if the order of the artists does not match up with Genius', 
-    # it will redirect to a "Page Not Found" page.
-    # Create a function "shuffle" that shuffles the artist names and pings the url
-    # until a 200 GET request is obtained.
+    
+    # If even the order of the artists does not match up exactly 
+    # with Genius', the URL will not return the lyrics.
+    
+    # Create a method "shuffle" that shuffles the artist names 
+    # and pings the url until a 200 GET request is obtained.
 
     if len(song_names) != len(artist_names):
         err = 'Missing song or artist information'
