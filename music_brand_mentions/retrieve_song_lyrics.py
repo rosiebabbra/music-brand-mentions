@@ -2,7 +2,7 @@ import os
 import re
 import json
 import requests
-from retrieve_top_hundred_songs import retrieve_chart_data
+from retrieve_song_name_and_artist import retrieve_chart_data
 
 from bs4 import BeautifulSoup
 
