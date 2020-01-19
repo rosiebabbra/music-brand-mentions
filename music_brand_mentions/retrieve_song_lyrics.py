@@ -6,8 +6,6 @@ from retrieve_top_hundred_songs import retrieve_chart_data
 
 from bs4 import BeautifulSoup
 
-# Remember to write helper functions like: _helper_function()
-
 
 def generate_urls():
 
@@ -34,13 +32,11 @@ def retrieve_lyrics(url):
     lyrics = html.find("div", class_="lyrics").get_text()
 
     cleaned_lyrics = re.findall(r'([^[\]]+)(?:$|\[)', lyrics)
-    cleaned_lyrics = ' '.join(cleaned_lyrics)
+    cleaned_lyrics = ' '.join(cleaned_lyrics)\
+                        .replace('\n', ' ')\
+                        .replace('(', '')\
+                        .replace(')', '')\
+                        .replace(',', '')\
+                        .replace('?', '')
 
-    print(cleaned_lyrics.replace('\n', ' ').replace(
-        '(', '').replace(')', '').replace(',', '').replace('?', ''))
-
-
-retrieve_lyrics('https://genius.com/post-malone-circles-lyrics')
-
-# if name == __main__:
-#    urls = generate_urls()
+    return cleaned_lyrics
