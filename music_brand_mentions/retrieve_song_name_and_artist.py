@@ -1,60 +1,50 @@
 import os
 import json
+import time
 import requests
 
 from bs4 import BeautifulSoup
+from utilities import retrieve_saturday_dates
 
 
 class MissingDataException(Exception):
     """Raise for output that lacks both song and artist name for each item."""
 
 
-def _return_chart_metadata(meta, level):
-    """Gathers information about top music charts.
-
-    Args:
-        meta (str): 'song' or 'artist'
-        level (str): 'primary' or 'secondary
-
-    Returns:
-        List: collection of metadata from charts page.
-
-    """
+def _retrieve_song_names(url):
 
     doc = requests.get(url)
     html = BeautifulSoup(doc.text, 'lxml')
 
-    meta_class = f'chart-element__information__{meta} text--truncate color--{level}'
+    soup = html.findAll("span", {"class":"chart-list-item__title-text"})
+    song_names = [x.get_text().strip() for x in soup]
 
-    meta = html.findAll("span", {"class": meta_class})
-    meta_collection = [x.get_text().replace(' ', '-').lower() for x in meta]
-
-    return meta_collection
+    return song_names
 
 
-def retrieve_chart_data(url):
+def _retrieve_artist_names(url):
+
+    doc = requests.get(url)
+    html = BeautifulSoup(doc.text, 'lxml')
+
+    soup = html.findAll("div", {"class":"chart-list-item__artist"})
+    song_names = [x.get_text().strip() for x in soup]
+
+    return song_names
+
+
+def retrieve_chart_data(url, week):
     """
     Args:
-        url (str): url of Billboard webpage containing U.S. charts.
+        url (str): url of Billboard webpage containing hip hop charts.
 
     Returns:
-        Dict: key value pairs of each top song and its artist(s).
+        dict: key value pairs of each top song and its artist(s).
 
     """
 
-    song_names = _return_chart_metadata('song', 'primary')
-    artist_names = _return_chart_metadata('artist', 'secondary')
-    
-    # Need to adjust to handle multiple artists. For example:
-    
-    # Current format: https://genius.com/anuel-aa,-daddy-yankee,-karol-g,-ozuna-&-j-balvin-china-lyrics
-    # Correct format: https://genius.com/anuel-aa-daddy-yankee-and-karol-g-china-lyrics
-    
-    # If even the order of the artists does not match up exactly 
-    # with Genius', the URL will not return the lyrics.
-    
-    # Create a method "shuffle" that shuffles the artist names 
-    # and pings the url until a 200 GET request is obtained.
+    song_names = _retrieve_song_names(url)
+    artist_names = _retrieve_artist_names(url)
 
     if len(song_names) != len(artist_names):
         err = 'Missing song or artist information'
@@ -62,4 +52,21 @@ def retrieve_chart_data(url):
 
     chart = {song_names[i]: artist_names[i] for i in range(len(song_names))}
 
-    return chart
+    with open(f'data/charts/{week}.txt', 'w') as file:
+        file.write(json.dumps(chart))
+
+
+if __name__ == '__main__':
+    
+    dates = []
+    for date in retrieve_saturday_dates(2019):
+        dates.append(date)
+
+    urls = []
+    for x in dates:
+        url = f'https://www.billboard.com/charts/r-b-hip-hop-songs/{x}'
+        urls.append(url)
+
+    for x in urls:
+        time.sleep(4)
+        retrieve_chart_data(x, x.split('/')[-1])
