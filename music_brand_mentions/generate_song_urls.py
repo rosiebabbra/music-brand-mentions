@@ -70,7 +70,7 @@ if __name__ == '__main__':
                 api_path = get_song_api_path(song, artist)
                 api_paths.append(api_path)
 
-                with open(f'data/redo_urls/{date}_api_paths.txt', 'w') as f:
+                with open(f'data/urls/{date}_api_paths.txt', 'w') as f:
                     f.writelines("%s," % place for place in api_paths)
                 
             except:
@@ -87,7 +87,9 @@ if __name__ == '__main__':
         for item in api_paths[date]:
             try:
                 lyrics_urls.append(generate_lyrics_webpage_url(item))
+
                 with open(f'data/lyric_urls/{date}_lyric_urls.txt', 'w') as file:
                     file.writelines("%s," % place for place in lyrics_urls)
+
             except:
                 pass
