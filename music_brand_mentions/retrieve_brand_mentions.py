@@ -1,5 +1,6 @@
 import os
 import json
+import pandas as pd
 
 from utilities import retrieve_saturday_dates
 
@@ -41,13 +42,3 @@ def count_brand_occurances(file_path):
         brand_ct[brand] = _count_substring_occurance(text, brand)
 
     return brand_ct
-
-
-if __name__ == '__main__':
-
-    brand_cts = {}
-
-    dates = [date.strftime("%Y-%m-%d") for date in retrieve_saturday_dates(2019)]
-
-    for date in dates:
-        brand_cts[date] = count_brand_occurances(f'data/lyrics/{date}_lyrics.txt')

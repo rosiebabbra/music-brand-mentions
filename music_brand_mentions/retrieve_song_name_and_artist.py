@@ -52,21 +52,8 @@ def retrieve_chart_data(url, week):
 
     chart = {song_names[i]: artist_names[i] for i in range(len(song_names))}
 
+    if not os.path.exists('data/charts/'):
+        os.makedirs('data/charts/')
+
     with open(f'data/charts/{week}.txt', 'w') as file:
         file.write(json.dumps(chart))
-
-
-if __name__ == '__main__':
-    
-    dates = []
-    for date in retrieve_saturday_dates(2019):
-        dates.append(date)
-
-    urls = []
-    for x in dates:
-        url = f'https://www.billboard.com/charts/r-b-hip-hop-songs/{x}'
-        urls.append(url)
-
-    for x in urls:
-        time.sleep(4)
-        retrieve_chart_data(x, x.split('/')[-1])

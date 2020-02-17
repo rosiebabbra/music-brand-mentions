@@ -1,4 +1,6 @@
 # Untracked files:
+Pipfile
+data.csv
 data/
 .env
 
