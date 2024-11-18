@@ -1,6 +1,6 @@
 # Overview
 
-This project identifies the top luxury fashion brands most name-dropped by rap artists in 2019. 
+This project identifies the top luxury fashion brands mentioned by artists in 2019. 
 
 ### Technologies
 
